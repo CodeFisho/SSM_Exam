@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qingluo.programmer.dao.admin.AuthorityDao">
+<!--权限插入操作  -->
+	<insert id="add" parameterType="Authority">
+		INSERT INTO authority(id,roleId,menuId) VALUES(null,#{roleId},#{menuId})
+	</insert>
+	
+<!--权限删除操作  -->
+	<delete id="deleteByRoleId" parameterType="Long">
+		DELETE FROM authority WHERE roleId=#{roleId}
+	
+	</delete>
+<!-- 权限信息查询 -->
+	<select id="findListByRoleId" parameterType="Long" resultType="Authority">
+		SELECT * FROM authority 
+		<if test="_parameter !=null">
+			WHERE roleId = #{roleId} 
+		</if>
+	</select>
+</mapper>

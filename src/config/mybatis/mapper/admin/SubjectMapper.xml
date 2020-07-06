@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qingluo.programmer.dao.admin.SubjectDao">
+<!--学科信息插入操作  -->
+	<insert id="add" parameterType="Subject">
+		INSERT INTO subject(id,name,remark) VALUES(null,#{name},#{remark})
+	</insert>
+	
+<!-- 学科信息编辑 -->
+	<update id="edit" parameterType="Subject" >
+		UPDATE subject SET name=#{name},remark=#{remark} 
+		WHERE id=#{id}
+	</update>
+<!-- 学科信息查询 -->
+	<select id="findList" parameterType="Map" resultType="Subject">
+		SELECT * FROM subject  
+		<if test="name !=null">
+			WHERE name like '%${name}%' 
+		</if>
+		<if test="offset !=null and pageSize !=null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+	
+<!-- 模糊搜索总条数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		SELECT COUNT(*) FROM subject  
+		<if test="name !=null">
+			WHERE name like '%${name}%' 
+		</if>
+	</select>
+<!-- 通过id查询信息 -->
+	<select id="findById" parameterType="Long" resultType="Subject">
+		SELECT * FROM subject WHERE id=#{value} 
+		
+	</select>
+<!-- 删除学科信息 -->
+	<delete id="delete" parameterType="Long" >
+		DELETE FROM subject WHERE id =#{id}
+	</delete>
+</mapper>

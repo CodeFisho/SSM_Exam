@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qingluo.programmer.dao.admin.ExamPaperDao">
+
+	<resultMap id="userHistory" type="ExamPaper">
+		<id column="ep_id" property="id"/>
+		<result column="ep_examId" property="examId"/>
+		<result column="ep_studentId" property="studentId"/>
+		<result column="ep_status" property="status"/>
+		<result column="ep_totalScore" property="totalScore"/>
+		<result column="ep_score" property="score"/>
+		<result column="ep_startExamTime" property="startExamTime"/>
+		<result column="ep_endExamTime" property="endExamTime"/>
+		<result column="ep_useTime" property="useTime"/>
+		<result column="ep_createTime" property="createTime"/>
+		<association property="exam" javaType="Exam">
+			<id column="e_id" property="id"/>
+			<result column="e_name" property="name"/>
+			<result column="e_subjectId" property="subjectId"/>
+			<result column="e_startTime" property="startTime"/>
+			<result column="e_endTime" property="endTime"/>
+			<result column="e_avaliableTime" property="avaliableTime"/>
+			<result column="e_questionNum" property="questionNum"/>
+			<result column="e_totalScore" property="totalScore"/>
+			<result column="e_passScore" property="passScore"/>
+			<result column="e_singleQuestionNum" property="singleQuestionNum"/>
+			<result column="e_muiltQuestionNum" property="muiltQuestionNum"/>
+			<result column="e_chargeQuestionNum" property="chargeQuestionNum"/>
+			<result column="e_paperNum" property="paperNum"/>
+			<result column="e_examedNum" property="examedNum"/>
+			<result column="e_passNum" property="passNum"/>
+			<result column="e_createTime" property="createTime"/>
+		</association>
+	</resultMap>
+<!--试卷信息插入操作  -->
+	<insert id="add"  useGeneratedKeys="true" keyProperty="id" parameterType="ExamPaper">
+		INSERT INTO exampaper(id,examId,studentId,totalScore,score,status,createTime) 
+		VALUES(null,#{examId},#{studentId},#{totalScore},#{score},#{status},now())
+	</insert>
+	
+<!-- 试卷信息编辑 -->
+	<update id="edit" parameterType="ExamPaper" >
+		UPDATE exampaper SET examId=#{examId},studentId=#{studentId} WHERE id=#{id}
+	</update>
+
+<!-- 交卷操作 -->
+	<update	id="submitPaper" parameterType="ExamPaper">
+		UPDATE exampaper SET status=#{status},score=#{score},startExamTime=#{startExamTime},
+		endExamTime=#{endExamTime},useTime=#{useTime} WHERE id=#{id}
+	</update>
+
+<!-- 试卷信息多条件查询 -->
+	<select id="findList" parameterType="Map" resultType="ExamPaper">
+		SELECT * FROM exampaper  WHERE 1=1 
+		<if test="examId !=null">
+			AND examId = #{examId}  
+		</if>
+		<if test="studentId !=null">
+			AND studentId=#{studentId}  
+		</if>
+		<if test="status!=null">
+			AND status = #{status}  
+		</if>
+		
+		<if test="offset !=null and pageSize !=null">
+			LIMIT #{offset},#{pageSize}
+		</if>
+		
+	</select>
+	
+<!-- 模糊搜索试卷总条数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		SELECT COUNT(*) FROM exampaper WHERE 1=1 
+		<if test="examId !=null">
+			AND examId = #{examId}  
+		</if>
+		<if test="studentId !=null">
+			AND studentId=#{studentId}  
+		</if>
+		<if test="status!=null">
+			AND status = #{status}  
+		</if>
+	</select>
+<!-- 考生试卷信息查询 -->
+	<select id="findOnePaper" parameterType="Map" resultType="ExamPaper">
+		SELECT * FROM exampaper WHERE examId=#{examId} AND studentId=#{studentId}
+	</select>
+<!-- 删除试题信息 -->
+
+	<delete id="delete" parameterType="Long" >
+		DELETE FROM exampaper WHERE id =#{id}
+	</delete>
+<!-- 用户查询考过的试卷信息 -->
+	<select id="findHistory" parameterType="Map"  resultMap="userHistory">
+		SELECT  
+			ep.id as ep_id,ep.examId as ep_examId,ep.studentId as ep_studentId,ep.status as ep_status,
+			ep.totalScore as ep_totalScore,ep.score as ep_score,ep.startExamTime as ep_startExamTime,
+			ep.endExamTime as ep_endExamTime,ep.useTime as ep_useTime,ep.createTime as ep_createTime,
+			e.id as e_id,e.name as e_name,e.subjectId as e_subjectId,e.startTime as  e_startTime,e.endTime as  e_endTime,
+			e.avaliableTime as e_avaliableTime,e.questionNum as e_questionNum,e.totalScore as e_totalScore,
+			e.passScore as e_passScore,e.singleQuestionNum as e_singleQuestionNum,e.muiltQuestionNum as e_muiltQuestionNum,
+			e.chargeQuestionNum as e_chargeQuestionNum,e.paperNum as e_paperNum,e.examedNum as e_examedNum,
+			e.passNum as e_passNum,e.createTime as e_createTime 
+		FROM exampaper ep,exam e WHERE ep.examId=e.id AND ep.studentId =#{studentId}  And status=1 
+	
+	<if test="name !=null">
+		AND e.name LIKE '%${name}%' 
+	</if>
+	<if test="subjectId !=null">
+		AND e.subjectId=#{subjectId} 
+	</if>
+		ORDER BY ep.createTime DESC 
+	<if test="offset !=null and pageSize !=null">
+		LIMIT #{offset},#{pageSize} 
+	</if>	 
+	</select>
+<!-- 历史信息模糊查询 -->
+	<select id="getHistoryTotal" parameterType="Map" resultType="Integer">
+		SELECT COUNT(*) FROM exampaper ep,exam e WHERE ep.examId=e.id AND ep.studentId =#{studentId} 
+		<if test="name !=null">
+		AND e.name LIKE '%${name}%' 
+	</if>
+	<if test="subjectId !=null">
+		AND e.subjectId=#{subjectId} 
+	</if>
+	</select>
+<!--  -->
+	<select id="getExamStats" parameterType="Long" resultType="Map">
+		SELECT ep.score as score,ep.totalScore as totalScore,stu.name as sname FROM exampaper ep,student stu WHERE ep.examId=#{value} AND ep.studentId=stu.id
+	</select>
+</mapper>

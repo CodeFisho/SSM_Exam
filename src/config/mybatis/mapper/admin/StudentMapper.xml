@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qingluo.programmer.dao.admin.StudentDao">
+<!--考生信息插入操作  -->
+	<insert id="add" parameterType="Student">
+		INSERT INTO student(id,subjectId,name,password,trueName,tel,createTime)
+		VALUES(null,#{subjectId},#{name},#{password},#{trueName},#{tel},now())
+	</insert>
+	
+<!-- 考生信息编辑 -->
+	<update id="edit" parameterType="Student" >
+		UPDATE student SET name=#{name},subjectId=#{subjectId},password=#{password},trueName=#{trueName},tel=#{tel}
+		WHERE id=#{id}
+	</update>
+<!-- 考生信息查询 -->
+	<select id="findList" parameterType="Map" resultType="Student">
+		SELECT * FROM student  WHERE 1=1
+		<if test="name !=null">
+			AND name like '%${name}%' 
+		</if>
+		<if test="subjectId !=null">
+			AND sunjectId=#{subjectId}  
+		</if>
+		<if test="offset !=null and pageSize !=null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+<!-- 查询考生的用户名和密码 -->
+	<select id="findNameAndPassword" parameterType="String" resultType="Student">
+		SELECT name,password FROM student WHERE name=#{value}
+	</select>
+<!-- 查询学生的所有信息 -->
+	<select id="findAllInfo" parameterType="String" resultType="Student">
+		SELECT * FROM student WHERE name=#{value}
+	</select>	
+<!-- 模糊搜索总条数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		SELECT COUNT(*) FROM student WHERE 1=1 
+		<if test="name !=null">
+			AND name like '%${name}%'  
+		</if>
+		<if test="subjectId !=null">
+			AND sunjectId=#{subjectId}  
+		</if>
+	</select>
+<!--根据用户名查找用户是否已经存在存在  -->
+	<select id="findNameByNameAndId" parameterType="String" resultType="Student">
+		SELECT name,id FROM student WHERE name=#{value}
+	
+	</select>
+<!-- 删除考生信息 -->
+	<delete id="delete" parameterType="Long" >
+		DELETE FROM student WHERE id =#{id}
+	</delete>
+</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qingluo.programmer.dao.admin.QuestionDao">
+<!--试题信息插入操作  -->
+	<insert id="add" parameterType="Question">
+		INSERT INTO question(id,questionType,subjectId,title,score,attrA,attrB,attrC,attrD,answer,createTime)
+		VALUES(null,#{questionType},${subjectId},#{title},#{score},#{attrA},#{attrB},#{attrC},#{attrD},#{answer},now())
+	</insert>
+<!--根据id查询试题信息  -->
+	<select id="findById" parameterType="Long" resultType="Question">
+		SELECT * FROM question WHERE id=#{id}
+	</select>
+<!-- 试题信息编辑 -->
+	<update id="edit" parameterType="Question" >
+		UPDATE question SET subjectId=#{subjectId},questionType=#{questionType},title=#{title},score=#{score},
+		attrA=#{attrA},attrB=#{attrB},attrC=#{attrC},attrD=#{attrD},answer=#{answer}
+		WHERE id=#{id}
+	</update>
+<!-- 试题信息查询 -->
+	<select id="findList" parameterType="Map" resultType="Question">
+		SELECT * FROM question  WHERE 1=1
+		<if test="title !=null">
+			AND title like '%${title}%' 
+		</if>
+		<if test="questionType !=null">
+			AND questionType=#{questionType}  
+		</if>
+		<if test="subjectId !=null">
+			AND subjectId=#{subjectId}  
+		</if>
+		<if test="offset !=null and pageSize !=null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+	
+<!-- 模糊搜索试题总条数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		SELECT COUNT(*) FROM question WHERE 1=1 
+		<if test="title !=null">
+			AND title like '%${title}%' 
+		</if>
+		<if test="subjectId !=null">
+			AND subjectId=#{subjectId}  
+		</if>
+		<if test="questionType !=null">
+			AND questionType=#{questionType}  
+		</if>
+	</select>
+<!--根据试题内容查找试题  -->
+	<select id="findByTitle" parameterType="String" resultType="Question">
+		SELECT * FROM question WHERE title=#{value}
+	
+	</select>
+<!-- 删除试题信息 -->
+	<delete id="delete" parameterType="Long" >
+		DELETE FROM question WHERE id =#{id}
+	</delete>
+<!--根据题型查询所有的题目数量  -->
+	<select id="getQuestionNumByType" parameterType="Map" resultType="Integer">
+		SELECT COUNT(*) FROM question WHERE questionType=#{questionType} AND subjectId=#{subjectId}
+	</select>
+<!--根据题型查找对应的题目 -->
+	<select id="findQuestionByType" parameterType="Map" resultType="Question">
+		SELECT * FROM question WHERE questionType=#{questionType} AND subjectId=#{subjectId}
+	</select>
+
+</mapper>

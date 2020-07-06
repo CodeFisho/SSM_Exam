@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qingluo.programmer.dao.admin.RoleDao">
+<!--菜单插入操作  -->
+	<insert id="add" parameterType="Role">
+		INSERT INTO role(id,name,remark) VALUES(null,#{name},#{remark})
+	</insert>
+	
+<!--编辑菜单信息  -->
+	
+	<update id="edit" parameterType="Role">
+		UPDATE role SET name=#{name},remark=#{remark} 
+		WHERE id= #{id}
+	</update>
+	
+<!--菜单删除操作  -->
+	<delete id="delete" parameterType="Long">
+		DELETE FROM role WHERE id=#{id}
+	
+	</delete>
+	
+
+<!-- 菜单信息模糊分页搜索查询 -->
+	<select id="findList" parameterType="Map" resultType="Role">
+		SELECT * FROM role 
+		<if test="name !=null">
+			WHERE name LIKE '%${name}%' 
+		</if>
+		<if test="offset !=null and pageSize !=null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+
+	
+<!-- 菜单信息模糊分页搜索查询总记录数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		SELECT COUNT(*) FROM role  		
+		<if test="name !=null">
+			WHERE name LIKE '%${name}%'
+		</if>
+	</select>
+	
+<!-- 根据用户的id来查询 -->
+	<select id="find" parameterType="Long" resultType="Role">
+		SELECT * FROM role  		
+		WHERE id=#{id}
+		
+	</select>
+</mapper>
